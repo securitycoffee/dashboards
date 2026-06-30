@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="slfrf-data.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  ::selection { background: oklch(0.62 0.2 352 / 0.25); }
+  .scrollx::-webkit-scrollbar { height: 8px; }
+  .scrollx::-webkit-scrollbar-thumb { background: #d8d2c7; border-radius: 8px; }
+</style>
+</helmet>
+<template id="__bundler_thumbnail" data-bg-color="#f5f1e9">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#f5f1e9"/>
+    <rect x="160" y="170" width="300" height="90" rx="14" fill="#1a1814"/>
+    <rect x="490" y="170" width="220" height="90" rx="14" fill="oklch(0.64 0.15 162)"/>
+    <rect x="740" y="170" width="300" height="90" rx="14" fill="oklch(0.6 0.2 352)"/>
+    <rect x="160" y="320" width="540" height="310" rx="18" fill="#fffdf8" stroke="#e4ddcf" stroke-width="3"/>
+    <rect x="200" y="540" width="60" height="60" rx="8" fill="oklch(0.58 0.17 255)"/>
+    <rect x="270" y="500" width="60" height="100" rx="8" fill="oklch(0.55 0.16 250)"/>
+    <rect x="340" y="450" width="60" height="150" rx="8" fill="oklch(0.5 0.16 248)"/>
+    <rect x="410" y="420" width="60" height="180" rx="8" fill="oklch(0.46 0.17 250)"/>
+    <circle cx="880" cy="475" r="120" fill="none" stroke="oklch(0.58 0.17 255)" stroke-width="46"/>
+    <circle cx="880" cy="475" r="120" fill="none" stroke="oklch(0.76 0.15 70)" stroke-width="46" stroke-dasharray="210 540" stroke-dashoffset="-40" transform="rotate(-90 880 475)"/>
+  </svg>
+</template>
+<div style="min-height:100vh;background:#f5f1e9;color:#1a1814;font-family:'IBM Plex Sans',sans-serif;padding:28px 32px 64px;">
+
+  <!-- HEADER -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;border-bottom:2px solid #1a1814;padding-bottom:18px;margin-bottom:24px;">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:oklch(0.62 0.2 352);font-weight:600;margin-bottom:8px;">State &amp; Local Fiscal Recovery Funds · Grant Sales Motion</div>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1.0;margin:0;letter-spacing:-0.02em;">Government Funds Dashboard</h1>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6458;">
+      <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:oklch(0.66 0.15 162);"></span>
+      Live filter · {{ filteredCount }} of {{ total }} recipients
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;">
+    <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+      <div style="{{ k.cardStyle }}">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.72;font-weight:600;">{{ k.label }}</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;line-height:1.05;margin-top:10px;letter-spacing:-0.02em;">{{ k.value }}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:6px;opacity:0.8;">{{ k.sub }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- CONTROLS -->
+  <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:#fffdf8;border:1.5px solid #e4ddcf;border-radius:14px;padding:14px 16px;margin-bottom:22px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#8a8170;font-weight:600;">Tier</span>
+      <sc-for list="{{ tierChips }}" as="c" hint-placeholder-count="4">
+        <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+      </sc-for>
+    </div>
+    <div style="width:1px;height:26px;background:#e4ddcf;"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#8a8170;font-weight:600;">Type</span>
+      <sc-for list="{{ typeChips }}" as="c" hint-placeholder-count="3">
+        <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+      </sc-for>
+    </div>
+    <div style="flex:1;"></div>
+    <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="Search recipient or state…" style="font-family:'IBM Plex Sans',sans-serif;font-size:14px;padding:9px 14px;border:1.5px solid #e4ddcf;border-radius:10px;background:#f5f1e9;width:240px;outline:none;color:#1a1814;" />
+    <sc-if value="{{ anyFilter }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ resetFilters }}" style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:9px 14px;border:1.5px solid #1a1814;border-radius:10px;background:#1a1814;color:#f5f1e9;cursor:pointer;">Reset ✕</button>
+    </sc-if>
+  </div>
+
+  <!-- ROW B: MAP + TIER DONUT -->
+  <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:18px;margin-bottom:18px;">
+
+    <!-- MAP -->
+    <div style="background:#fffdf8;border:1.5px solid #e4ddcf;border-radius:16px;padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;">
+        <div>
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;margin:0;letter-spacing:-0.01em;">Funds by State</h3>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;margin-top:3px;">{{ stateCountLabel }} · click a state to filter</div>
+        </div>
+        <div style="display:flex;gap:4px;background:#f0eadd;border-radius:9px;padding:3px;">
+          <sc-for list="{{ metricChips }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(11,1fr);grid-auto-rows:1fr;gap:5px;margin-top:14px;">
+        <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="40">
+          <div onClick="{{ t.onClick }}" title="{{ t.title }}" style="{{ t.style }}">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;">{{ t.ab }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;">
+        <span>{{ legendLow }}</span>
+        <div style="flex:1;height:9px;border-radius:6px;background:{{ legendGradient }};"></div>
+        <span>{{ legendHigh }}</span>
+      </div>
+    </div>
+
+    <!-- TIER DONUT -->
+    <div style="background:#fffdf8;border:1.5px solid #e4ddcf;border-radius:16px;padding:20px 22px;">
+      <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;margin:0 0 2px;letter-spacing:-0.01em;">Reporting Tier Makeup</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;margin-bottom:8px;">Share of allocated funds · click to filter</div>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
+          <svg viewBox="0 0 160 160" style="width:160px;height:160px;transform:rotate(-90deg);">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#efe9dc" stroke-width="26"></circle>
+            <sc-for list="{{ tierDonut }}" as="s" hint-placeholder-count="3">
+              <circle cx="80" cy="80" r="60" fill="none" stroke="{{ s.color }}" stroke-width="26" stroke-dasharray="{{ s.dash }}" stroke-dashoffset="{{ s.offset }}" onClick="{{ s.onClick }}" style="cursor:pointer;"></circle>
+            </sc-for>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;line-height:1;">{{ tierTotal }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;">allocated</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:9px;">
+          <sc-for list="{{ tierDonut }}" as="s" hint-placeholder-count="3">
+            <div onClick="{{ s.onClick }}" style="{{ s.legendStyle }}">
+              <span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:{{ s.color }};flex-shrink:0;"></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;">{{ s.label }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8a8170;">{{ s.detail }}</div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;">{{ s.pctLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW C: TYPE DONUT + BARS -->
+  <div style="display:grid;grid-template-columns:1fr 1.35fr;gap:18px;margin-bottom:18px;">
+
+    <!-- TYPE DONUT -->
+    <div style="background:#fffdf8;border:1.5px solid #e4ddcf;border-radius:16px;padding:20px 22px;">
+      <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;margin:0 0 2px;letter-spacing:-0.01em;">Recipient Type</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;margin-bottom:8px;">Allocation by recipient type</div>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
+          <svg viewBox="0 0 160 160" style="width:160px;height:160px;transform:rotate(-90deg);">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#efe9dc" stroke-width="26"></circle>
+            <sc-for list="{{ typeDonut }}" as="s" hint-placeholder-count="2">
+              <circle cx="80" cy="80" r="60" fill="none" stroke="{{ s.color }}" stroke-width="26" stroke-dasharray="{{ s.dash }}" stroke-dashoffset="{{ s.offset }}" onClick="{{ s.onClick }}" style="cursor:pointer;"></circle>
+            </sc-for>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;line-height:1;">{{ typeTotal }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;">total</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ typeDonut }}" as="s" hint-placeholder-count="2">
+            <div onClick="{{ s.onClick }}" style="{{ s.legendStyle }}">
+              <span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:{{ s.color }};flex-shrink:0;"></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;">{{ s.label }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8a8170;">{{ s.detail }}</div>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;">{{ s.pctLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARS -->
+    <div style="background:#fffdf8;border:1.5px solid #e4ddcf;border-radius:16px;padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px;">
+        <div>
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;margin:0;letter-spacing:-0.01em;">Top Broadband Spend</h3>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;margin-top:3px;">Recipients with the most broadband spend</div>
+        </div>
+        <div style="display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:{{ spentColor }};opacity:0.4;"></span>Total spent</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:{{ bbColor }};"></span>Broadband</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;">
+        <sc-for list="{{ bars }}" as="b" hint-placeholder-count="8">
+          <div onClick="{{ b.onClick }}" style="cursor:pointer;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;">
+              <span style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ b.name }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#6b6458;flex-shrink:0;">{{ b.allocLabel }} · {{ b.spentPct }}</span>
+            </div>
+            <div style="position:relative;height:14px;background:#efe9dc;border-radius:7px;overflow:hidden;">
+              <div style="position:absolute;top:0;left:0;height:100%;width:{{ b.allocW }};background:{{ spentColor }};border-radius:7px;opacity:0.32;"></div>
+              <div style="position:absolute;top:0;left:0;height:100%;width:{{ b.spentW }};background:{{ bbColor }};border-radius:7px;"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div style="background:#fffdf8;border:1.5px solid #e4ddcf;border-radius:16px;padding:20px 22px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+      <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;margin:0;letter-spacing:-0.01em;">Recipients</h3>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <input value="{{ tableQuery }}" onInput="{{ onTableSearch }}" placeholder="Search this list…" style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 12px;border:1.5px solid #e4ddcf;border-radius:9px;background:#f5f1e9;width:200px;outline:none;color:#1a1814;" />
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;white-space:nowrap;">{{ tableCount }} rows · click header to sort</span>
+      </div>
+    </div>
+    <div class="scrollx" style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:760px;">
+        <thead>
+          <tr>
+            <sc-for list="{{ columns }}" as="col" hint-placeholder-count="7">
+              <th onClick="{{ col.onClick }}" style="{{ col.style }}">{{ col.label }}{{ col.arrow }}</th>
+            </sc-for>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ tierSections }}" as="sec" hint-placeholder-count="3">
+          <tr onClick="{{ sec.onClick }}" style="{{ sec.headerStyle }}">
+            <td colspan="8" style="padding:11px 12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6b6458;width:12px;">{{ sec.caret }}</span>
+                <span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:{{ sec.color }};"></span>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:14px;">{{ sec.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8a8170;">{{ sec.meta }}</span>
+              </div>
+            </td>
+          </tr>
+          <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="5">
+            <tr style="{{ r.rowStyle }}">
+              <td style="padding:10px 12px;font-weight:600;">{{ r.name }}</td>
+              <td style="padding:10px 12px;color:#6b6458;">{{ r.state }}</td>
+              <td style="padding:10px 12px;"><span style="{{ r.tierBadge }}">{{ r.tierLabel }}</span></td>
+              <td style="padding:10px 12px;color:#6b6458;">{{ r.type }}</td>
+              <td style="padding:10px 12px;text-align:right;font-family:'IBM Plex Mono',monospace;">{{ r.alloc }}</td>
+              <td style="padding:10px 12px;text-align:right;font-family:'IBM Plex Mono',monospace;">{{ r.spent }}</td>
+              <td style="padding:10px 12px;text-align:right;">
+                <div style="display:flex;align-items:center;gap:7px;justify-content:flex-end;">
+                  <div style="width:46px;height:6px;background:#efe9dc;border-radius:4px;overflow:hidden;"><div style="height:100%;width:{{ r.spentPctW }};background:{{ spentColor }};"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:38px;">{{ r.spentPct }}</span>
+                </div>
+              </td>
+              <td style="padding:10px 12px;text-align:right;font-family:'IBM Plex Mono',monospace;">{{ r.bb }}</td>
+            </tr>
+          </sc-for>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:1280},&quot;palette&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Vibrant&quot;,&quot;Ocean&quot;,&quot;Sunset&quot;],&quot;default&quot;:&quot;Vibrant&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;barCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:5,&quot;max&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Charts&quot;,&quot;unit&quot;:&quot;bars&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.DATA = (Array.isArray(window.SLFRF_DATA) && window.SLFRF_DATA.length) ? window.SLFRF_DATA : [{"id":"RCP-036074","name":"State Of Alabama","state":"Alabama","tier":"1","type":"State/DC","alloc":2120363595,"spent":2120320848,"bb":288901265,"rem":42747,"ab":"AL"},{"id":"RCP-036064","name":"Pima County, Arizona","state":"Arizona","tier":"1","type":"Local Government","alloc":203421668,"spent":203421666,"bb":6999345,"rem":2,"ab":"AZ"},{"id":"RCP-039340","name":"El Cajon, California","state":"California","tier":"2","type":"Local Government","alloc":30399751,"spent":30232505,"bb":2997825,"rem":167246,"ab":"CA"},{"id":"RCP-039564","name":"Chico, California","state":"California","tier":"2","type":"Local Government","alloc":22118301,"spent":22115219,"bb":4800000,"rem":3082,"ab":"CA"},{"id":"RCP-036954","name":"Santa Barbara, California","state":"California","tier":"2","type":"Local Government","alloc":21837523,"spent":21761361,"bb":60460,"rem":76162,"ab":"CA"},{"id":"RCP-047365","name":"Needles City, CA","state":"California","tier":"5","type":"Local Government","alloc":1190365,"spent":1190364,"bb":9000,"rem":1,"ab":"CA"},{"id":"RCP-038254","name":"West Hartford, Connecticut","state":"Connecticut","tier":"2","type":"Local Government","alloc":37234783,"spent":37234782,"bb":549999,"rem":1,"ab":"CT"},{"id":"RCP-036061","name":"State Of Florida","state":"Florida","tier":"1","type":"State/DC","alloc":8816700412,"spent":8807463074,"bb":380000000,"rem":9237338,"ab":"FL"},{"id":"RCP-036988","name":"Highlands County, Florida","state":"Florida","tier":"2","type":"Local Government","alloc":20632184,"spent":20630040,"bb":4520762,"rem":2144,"ab":"FL"},{"id":"RCP-035997","name":"Escambia County, Florida","state":"Florida","tier":"1","type":"Local Government","alloc":61829151,"spent":61829144,"bb":654486,"rem":7,"ab":"FL"},{"id":"RCP-035929","name":"Clay County, Florida","state":"Florida","tier":"2","type":"Local Government","alloc":42587131,"spent":42587130,"bb":2000000,"rem":1,"ab":"FL"},{"id":"RCP-036010","name":"State Of Georgia","state":"Georgia","tier":"1","type":"State/DC","alloc":4853535460,"spent":4853511034,"bb":414805005,"rem":24426,"ab":"GA"},{"id":"RCP-035889","name":"Ada County, Idaho","state":"Idaho","tier":"1","type":"Local Government","alloc":93542629,"spent":93117218,"bb":767680,"rem":425411,"ab":"ID"},{"id":"RCP-031567","name":"City Of American Falls, ID","state":"Idaho","tier":"5","type":"Local Government","alloc":928140,"spent":924338,"bb":880593,"rem":3802,"ab":"ID"},{"id":"RCP-038118","name":"Decatur, Illinois","state":"Illinois","tier":"2","type":"Local Government","alloc":33822135,"spent":33822134,"bb":296285,"rem":1,"ab":"IL"},{"id":"RCP-000941","name":"County Of Smith, KS","state":"Kansas","tier":"5","type":"Local Government","alloc":695956,"spent":695837,"bb":361777,"rem":119,"ab":"KS"},{"id":"RCP-036922","name":"Christian County, Kentucky","state":"Kentucky","tier":"2","type":"Local Government","alloc":13686223,"spent":13608357,"bb":13000000,"rem":77866,"ab":"KY"},{"id":"RCP-015224","name":"LaFayette city, KY","state":"Kentucky","tier":"5","type":"Local Government","alloc":41931,"spent":41433,"bb":41433,"rem":497,"ab":"KY"},{"id":"RCP-036858","name":"State of Maine","state":"Maine","tier":"1","type":"State/DC","alloc":997495130,"spent":997435844,"bb":21000000,"rem":59286,"ab":"ME"},{"id":"RCP-001286","name":"Prospect Town, ME","state":"Maine","tier":"5","type":"Local Government","alloc":78881,"spent":78000,"bb":78000,"rem":881,"ab":"ME"},{"id":"RCP-001303","name":"Verona Island Town, ME","state":"Maine","tier":"5","type":"Local Government","alloc":58473,"spent":55000,"bb":55000,"rem":3473,"ab":"ME"},{"id":"RCP-040163","name":"St. Mary's County, Maryland","state":"Maryland","tier":"2","type":"Local Government","alloc":22047987,"spent":22047351,"bb":5711996,"rem":636,"ab":"MD"},{"id":"RCP-003879","name":"Greenwood Township, MI","state":"Michigan","tier":"5","type":"Local Government","alloc":112340,"spent":112339,"bb":100000,"rem":1,"ab":"MI"},{"id":"RCP-027443","name":"Center Township, MN","state":"Minnesota","tier":"5","type":"Local Government","alloc":104583,"spent":44000,"bb":44000,"rem":60583,"ab":"MN"},{"id":"RCP-017233","name":"Pleasant Hill Township, MN","state":"Minnesota","tier":"5","type":"Local Government","alloc":57810,"spent":25043,"bb":25043,"rem":32767,"ab":"MN"},{"id":"RCP-036032","name":"State Of Mississippi","state":"Mississippi","tier":"1","type":"State/DC","alloc":1806400453,"spent":1806065549,"bb":118025,"rem":334905,"ab":"MS"},{"id":"RCP-039971","name":"Howell County, MO","state":"Missouri","tier":"5","type":"Local Government","alloc":7792257,"spent":7742183,"bb":249000,"rem":50074,"ab":"MO"},{"id":"RCP-040221","name":"Boone County, NE","state":"Nebraska","tier":"5","type":"Local Government","alloc":1008485,"spent":726248,"bb":50000,"rem":282237,"ab":"NE"},{"id":"RCP-035915","name":"State Of New Hampshire","state":"New Hampshire","tier":"1","type":"State/DC","alloc":994707992,"spent":994403099,"bb":658107,"rem":304892,"ab":"NH"},{"id":"RCP-025281","name":"Town Of Hebron, NH","state":"New Hampshire","tier":"5","type":"Local Government","alloc":65640,"spent":51271,"bb":18817,"rem":14369,"ab":"NH"},{"id":"RCP-039389","name":"Plainfield City, New Jersey","state":"New Jersey","tier":"2","type":"Local Government","alloc":23801983,"spent":23800488,"bb":1997613,"rem":1495,"ab":"NJ"},{"id":"RCP-035839","name":"County Of Bergen, New Jersey","state":"New Jersey","tier":"1","type":"Local Government","alloc":261035747,"spent":260944645,"bb":33704348,"rem":91102,"ab":"NJ"},{"id":"RCP-048991","name":"Ruidoso Downs City, NM","state":"New Mexico","tier":"5","type":"Local Government","alloc":630445,"spent":136682,"bb":20831,"rem":493763,"ab":"NM"},{"id":"RCP-018468","name":"Freedom Township, OH","state":"Ohio","tier":"5","type":"Local Government","alloc":97176,"spent":96983,"bb":96983,"rem":193,"ab":"OH"},{"id":"RCP-018540","name":"Village Of Wharton, OH","state":"Ohio","tier":"5","type":"Local Government","alloc":35547,"spent":35000,"bb":35000,"rem":547,"ab":"OH"},{"id":"RCP-018436","name":"Village Of Broughton, OH","state":"Ohio","tier":"5","type":"Local Government","alloc":11884,"spent":11837,"bb":11837,"rem":47,"ab":"OH"},{"id":"RCP-051921","name":"South Huntingdon Township, PA","state":"Pennsylvania","tier":"5","type":"Local Government","alloc":574351,"spent":567175,"bb":280000,"rem":7175,"ab":"PA"},{"id":"RCP-014238","name":"City Of Wakonda, SD","state":"South Dakota","tier":"5","type":"Local Government","alloc":53169,"spent":47917,"bb":25490,"rem":5251,"ab":"SD"},{"id":"RCP-037205","name":"Hamilton County, Tennessee","state":"Tennessee","tier":"1","type":"Local Government","alloc":71441615,"spent":71440732,"bb":655617,"rem":883,"ab":"TN"},{"id":"RCP-037980","name":"Harrison County, Texas","state":"Texas","tier":"2","type":"Local Government","alloc":12927140,"spent":12927035,"bb":1499895,"rem":105,"ab":"TX"},{"id":"RCP-036133","name":"Cameron County, Texas","state":"Texas","tier":"1","type":"Local Government","alloc":82194452,"spent":82193910,"bb":678164,"rem":542,"ab":"TX"},{"id":"RCP-036374","name":"Montgomery County, Texas","state":"Texas","tier":"1","type":"Local Government","alloc":117978581,"spent":117868209,"bb":3732576,"rem":110372,"ab":"TX"},{"id":"RCP-056546","name":"Socorro, TX","state":"Texas","tier":"5","type":"Local Government","alloc":8533234,"spent":8524819,"bb":385807,"rem":8416,"ab":"TX"},{"id":"RCP-036658","name":"Virginia Beach City, Virginia","state":"Virginia","tier":"1","type":"Local Government","alloc":136429703,"spent":136303304,"bb":8299993,"rem":126399,"ab":"VA"},{"id":"RCP-037100","name":"State of Virginia","state":"Virginia","tier":"1","type":"State/DC","alloc":4293727162,"spent":4293622343,"bb":496740000,"rem":104819,"ab":"VA"},{"id":"RCP-039765","name":"Loudoun County, Virginia","state":"Virginia","tier":"1","type":"Local Government","alloc":80324909,"spent":80300769,"bb":13425000,"rem":24140,"ab":"VA"},{"id":"RCP-036844","name":"Roanoke County, Virginia","state":"Virginia","tier":"2","type":"Local Government","alloc":18294526,"spent":18218074,"bb":2333957,"rem":76452,"ab":"VA"},{"id":"RCP-036912","name":"County Of Brunswick, VA","state":"Virginia","tier":"5","type":"Local Government","alloc":3152681,"spent":3152024,"bb":2267458,"rem":657,"ab":"VA"},{"id":"RCP-034408","name":"Town Of Maiden Rock, WI","state":"Wisconsin","tier":"5","type":"Local Government","alloc":64476,"spent":64000,"bb":64000,"rem":476,"ab":"WI"}];
+
+    this.GRID = {AK:[1,1],ME:[1,11],VT:[2,10],NH:[2,11],WA:[3,1],ID:[3,2],MT:[3,3],ND:[3,4],MN:[3,5],IL:[3,6],WI:[3,7],MI:[3,8],NY:[3,9],RI:[3,10],MA:[3,11],OR:[4,1],NV:[4,2],WY:[4,3],SD:[4,4],IA:[4,5],IN:[4,6],OH:[4,7],PA:[4,8],NJ:[4,9],CT:[4,10],CA:[5,1],UT:[5,2],CO:[5,3],NE:[5,4],MO:[5,5],KY:[5,6],WV:[5,7],VA:[5,8],MD:[5,9],DE:[5,10],AZ:[6,2],NM:[6,3],KS:[6,4],AR:[6,5],TN:[6,6],NC:[6,7],SC:[6,8],DC:[6,9],OK:[7,4],LA:[7,5],MS:[7,6],AL:[7,7],GA:[7,8],HI:[8,1],TX:[8,4],FL:[8,8],PR:[8,10],AS:[8,11]};
+
+    this._buildTotals();
+    this.state = { tier:'all', type:'all', stateSel:'all', q:'', sortKey:'alloc', sortDir:'desc', metric:'alloc', collapsed:{}, tableQ:'' };
+  }
+
+  toggleTier(t) { this.setState(s => ({ collapsed: { ...s.collapsed, [t]: !s.collapsed[t] } })); }
+
+  _buildTotals() {
+    this.stateTotals = {};
+    for (const r of this.DATA) {
+      const t = this.stateTotals[r.ab] || (this.stateTotals[r.ab] = {alloc:0,spent:0,bb:0,n:0,name:r.state});
+      t.alloc += r.alloc; t.spent += r.spent; t.bb += r.bb; t.n++;
+    }
+  }
+
+  componentDidMount() {
+    if (Array.isArray(window.SLFRF_DATA) && window.SLFRF_DATA.length && this.DATA !== window.SLFRF_DATA) {
+      this.DATA = window.SLFRF_DATA; this._buildTotals(); this.forceUpdate();
+    } else if (!Array.isArray(window.SLFRF_DATA)) {
+      this._poll = setInterval(() => {
+        if (Array.isArray(window.SLFRF_DATA) && window.SLFRF_DATA.length) {
+          clearInterval(this._poll); this.DATA = window.SLFRF_DATA; this._buildTotals(); this.forceUpdate();
+        }
+      }, 40);
+    }
+  }
+
+  componentWillUnmount() { if (this._poll) clearInterval(this._poll); }
+
+  palette() {
+    const p = this.props.palette || 'Vibrant';
+    if (p === 'Ocean') return {c1:'oklch(0.58 0.13 240)',c2:'oklch(0.66 0.12 192)',c3:'oklch(0.72 0.11 160)',c4:'oklch(0.55 0.14 270)',c5:'oklch(0.5 0.12 255)'};
+    if (p === 'Sunset') return {c1:'oklch(0.62 0.18 28)',c2:'oklch(0.72 0.16 62)',c3:'oklch(0.7 0.18 8)',c4:'oklch(0.58 0.16 348)',c5:'oklch(0.66 0.15 95)'};
+    return {c1:'oklch(0.58 0.17 255)',c2:'oklch(0.64 0.15 162)',c3:'oklch(0.76 0.15 70)',c4:'oklch(0.6 0.2 352)',c5:'oklch(0.55 0.18 300)'};
+  }
+
+  fmt(n) {
+    const s = n < 0 ? '-' : ''; n = Math.abs(n);
+    if (n >= 1e9) return s + '$' + (n/1e9).toFixed(2) + 'B';
+    if (n >= 1e6) return s + '$' + (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return s + '$' + (n/1e3).toFixed(0) + 'K';
+    return s + '$' + Math.round(n);
+  }
+
+  filtered() {
+    const q = this.state.q.trim().toLowerCase();
+    return this.DATA.filter(r =>
+      (this.state.tier === 'all' || r.tier === this.state.tier) &&
+      (this.state.type === 'all' || r.type === this.state.type) &&
+      (this.state.stateSel === 'all' || r.ab === this.state.stateSel) &&
+      (q === '' || r.name.toLowerCase().includes(q) || r.state.toLowerCase().includes(q))
+    );
+  }
+
+  setTier(t) { this.setState(s => ({ tier: s.tier === t ? 'all' : t })); }
+  setType(t) { this.setState(s => ({ type: s.type === t ? 'all' : t })); }
+  setStateSel(ab) { this.setState(s => ({ stateSel: s.stateSel === ab ? 'all' : ab })); }
+  setSort(k) { this.setState(s => ({ sortKey: k, sortDir: s.sortKey === k && s.sortDir === 'desc' ? 'asc' : 'desc' })); }
+
+  donut(groups, palette) {
+    const total = groups.reduce((a, g) => a + g.value, 0) || 1;
+    const C = 2 * Math.PI * 60;
+    let cum = 0;
+    return groups.map(g => {
+      const frac = g.value / total;
+      const dash = Math.max(0, frac * C - 1.5);
+      const seg = { ...g, frac, pct: frac * 100, pctLabel: (frac * 100).toFixed(1) + '%',
+        dash: dash + ' ' + (C - dash), offset: -cum * C };
+      cum += frac;
+      return seg;
+    });
+  }
+
+  chipStyle(active, color) {
+    return `font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer;border:1.5px solid ${active ? '#1a1814' : '#e4ddcf'};background:${active ? (color || '#1a1814') : '#fffdf8'};color:${active ? '#fff' : '#6b6458'};transition:all 0.12s;`;
+  }
+
+  renderVals() {
+    const pal = this.palette();
+    const f = this.filtered();
+    const sum = (arr, k) => arr.reduce((a, r) => a + r[k], 0);
+
+    // KPIs
+    const tA = sum(f, 'alloc'), tS = sum(f, 'spent'), tB = sum(f, 'bb'), tR = sum(f, 'rem');
+    const nStates = new Set(f.map(r => r.ab)).size;
+    const card = (bg, fg) => `background:${bg};color:${fg};border-radius:14px;padding:16px 18px;border:1.5px solid ${bg};`;
+    const kpis = [
+      { label: 'Total Allocation', value: this.fmt(tA), sub: f.length + ' recipients', cardStyle: card('#1a1814', '#f5f1e9') },
+      { label: 'Obligated / Spent', value: this.fmt(tS), sub: (tA ? (tS/tA*100).toFixed(1) : '0') + '% deployed', cardStyle: `background:${pal.c2};color:#fff;border-radius:14px;padding:16px 18px;border:1.5px solid ${pal.c2};` },
+      { label: 'Broadband Spend', value: this.fmt(tB), sub: (tS ? (tB/tS*100).toFixed(1) : '0') + '% of spend', cardStyle: `background:${pal.c3};color:#1a1814;border-radius:14px;padding:16px 18px;border:1.5px solid ${pal.c3};` },
+      { label: 'Remaining Funds', value: this.fmt(tR), sub: (tA ? (tR/tA*100).toFixed(2) : '0') + '% unspent', cardStyle: `background:${pal.c4};color:#fff;border-radius:14px;padding:16px 18px;border:1.5px solid ${pal.c4};` },
+      { label: 'States Covered', value: String(nStates), sub: 'of ' + Object.keys(this.stateTotals).length + ' in dataset', cardStyle: `background:#fffdf8;color:#1a1814;border-radius:14px;padding:16px 18px;border:1.5px solid #e4ddcf;` },
+    ];
+
+    // Tier chips
+    const tierColors = { '1': pal.c1, '2': pal.c5, '5': pal.c3 };
+    const tierChips = [{ k: 'all', l: 'All' }, { k: '1', l: 'Tier 1' }, { k: '2', l: 'Tier 2' }, { k: '5', l: 'Tier 5' }].map(c => ({
+      label: c.l, onClick: () => c.k === 'all' ? this.setState({ tier: 'all' }) : this.setTier(c.k),
+      style: this.chipStyle(this.state.tier === c.k, c.k === 'all' ? '#1a1814' : tierColors[c.k])
+    }));
+    const typeChips = [{ k: 'all', l: 'All' }, { k: 'State/DC', l: 'State / DC' }, { k: 'Local Government', l: 'Local Gov' }].map(c => ({
+      label: c.l, onClick: () => c.k === 'all' ? this.setState({ type: 'all' }) : this.setType(c.k),
+      style: this.chipStyle(this.state.type === c.k, c.k === 'State/DC' ? pal.c4 : pal.c2)
+    }));
+
+    // Metric chips (map)
+    const metricColor = { alloc: pal.c1, spent: pal.c2, bb: pal.c3 };
+    const metricHue = { alloc: this.props.palette === 'Sunset' ? 28 : (this.props.palette === 'Ocean' ? 240 : 255), spent: 162, bb: 70 };
+    const metricChips = [{ k: 'alloc', l: 'Allocation' }, { k: 'spent', l: 'Spent' }, { k: 'bb', l: 'Broadband' }].map(c => ({
+      label: c.l, onClick: () => this.setState({ metric: c.k }),
+      style: `font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;cursor:pointer;border:none;background:${this.state.metric === c.k ? '#1a1814' : 'transparent'};color:${this.state.metric === c.k ? '#fff' : '#8a8170'};`
+    }));
+
+    // MAP tiles
+    const metric = this.state.metric;
+    const hue = metricHue[metric];
+    let maxV = 0;
+    for (const k in this.stateTotals) maxV = Math.max(maxV, this.stateTotals[k][metric]);
+    maxV = maxV || 1;
+    const tiles = Object.entries(this.GRID).map(([ab, [row, col]]) => {
+      const t = this.stateTotals[ab];
+      const has = !!t;
+      const sel = this.state.stateSel === ab;
+      let bg = '#ece7dd', fg = '#bcb4a4', border = '1.5px solid transparent';
+      if (has) {
+        const inten = Math.sqrt(t[metric] / maxV);
+        const L = 0.93 - 0.46 * inten, Ch = 0.035 + 0.14 * inten;
+        bg = `oklch(${L.toFixed(3)} ${Ch.toFixed(3)} ${hue})`;
+        fg = inten > 0.55 ? '#fff' : '#1a1814';
+      }
+      if (sel) border = '2.5px solid #1a1814';
+      return {
+        ab, title: has ? `${t.name}: ${this.fmt(t[metric])} · ${t.n} recipient${t.n>1?'s':''}` : ab,
+        onClick: has ? () => this.setStateSel(ab) : () => {},
+        style: `grid-row:${row};grid-column:${col};aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;background:${bg};color:${fg};border:${border};cursor:${has ? 'pointer' : 'default'};box-shadow:${sel ? '0 0 0 3px oklch(0.62 0.2 352 / 0.25)' : 'none'};`
+      };
+    });
+    const metricLabel = { alloc: 'allocation', spent: 'spent', bb: 'broadband' }[metric];
+    const legendGradient = `linear-gradient(90deg, oklch(0.93 0.035 ${hue}), oklch(0.47 0.175 ${hue}))`;
+
+    // TIER donut (from filtered)
+    const tierAgg = {};
+    for (const r of f) { const t = tierAgg[r.tier] || (tierAgg[r.tier] = { v: 0, n: 0 }); t.v += r.alloc; t.n++; }
+    const tierNames = { '1': 'Tier 1 · Large states & metros', '2': 'Tier 2 · Mid-size local gov', '5': 'Tier 5 · Small local gov' };
+    const tierGroups = ['1', '2', '5'].filter(k => tierAgg[k]).map(k => ({
+      key: k, label: 'Tier ' + k, color: tierColors[k], value: tierAgg[k].v,
+      detail: tierAgg[k].n + ' recipients · ' + this.fmt(tierAgg[k].v)
+    }));
+    const tierDonut = this.donut(tierGroups, pal).map(s => ({
+      ...s, label: tierNames[s.key],
+      onClick: () => this.setTier(s.key),
+      legendStyle: `display:flex;align-items:center;gap:9px;cursor:pointer;padding:5px 7px;border-radius:8px;background:${this.state.tier === s.key ? '#f0eadd' : 'transparent'};`
+    }));
+
+    // TYPE donut
+    const typeAgg = {};
+    for (const r of f) { const t = typeAgg[r.type] || (typeAgg[r.type] = { v: 0, n: 0 }); t.v += r.alloc; t.n++; }
+    const typeLabel = k => k === 'State/DC' ? 'State / DC' : (k === 'Territorial Government' ? 'Territorial' : 'Local Government');
+    const typeColors = { 'State/DC': pal.c4, 'Local Government': pal.c2, 'Territorial Government': pal.c3 };
+    const typeGroups = Object.keys(typeAgg).map(k => ({
+      key: k, label: typeLabel(k), color: typeColors[k], value: typeAgg[k].v,
+      detail: typeAgg[k].n + ' recipients · ' + this.fmt(typeAgg[k].v)
+    }));
+    const typeDonut = this.donut(typeGroups, pal).map(s => ({
+      ...s, onClick: () => this.setType(s.key),
+      legendStyle: `display:flex;align-items:center;gap:9px;cursor:pointer;padding:5px 7px;border-radius:8px;background:${this.state.type === s.key ? '#f0eadd' : 'transparent'};`
+    }));
+
+    // BARS — top recipients by broadband spend
+    const barCount = this.props.barCount || 8;
+    const sortedB = [...f].sort((a, b) => b.bb - a.bb).slice(0, barCount);
+    const maxBase = sortedB.length ? Math.max(...sortedB.map(r => Math.max(r.spent, r.bb))) : 1;
+    const bars = sortedB.map(r => ({
+      name: r.name, allocLabel: this.fmt(r.bb) + ' broadband',
+      spentPct: (r.spent ? (r.bb / r.spent * 100) : 0).toFixed(0) + '% of spend',
+      allocW: (r.spent / maxBase * 100).toFixed(2) + '%',
+      spentW: (r.bb / maxBase * 100).toFixed(2) + '%',
+      onClick: () => this.setStateSel(r.ab)
+    }));
+
+    // TABLE
+    const cols = [
+      { k: 'name', l: 'Recipient', align: 'left' }, { k: 'state', l: 'State', align: 'left' },
+      { k: 'tier', l: 'Tier', align: 'left' }, { k: 'type', l: 'Type', align: 'left' },
+      { k: 'alloc', l: 'Allocation', align: 'right' }, { k: 'spent', l: 'Spent', align: 'right' },
+      { k: 'spentpct', l: '% Spent', align: 'right' }, { k: 'bb', l: 'Broadband', align: 'right' }
+    ];
+    const columns = cols.map(c => ({
+      label: c.l, arrow: this.state.sortKey === c.k ? (this.state.sortDir === 'desc' ? ' ↓' : ' ↑') : '',
+      onClick: () => this.setSort(c.k),
+      style: `text-align:${c.align};padding:9px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:#8a8170;font-weight:600;cursor:pointer;border-bottom:2px solid #1a1814;white-space:nowrap;user-select:none;`
+    }));
+    const dir = this.state.sortDir === 'desc' ? -1 : 1;
+    const sk = this.state.sortKey;
+    const sortFn = (a, b) => {
+      let av, bv;
+      if (sk === 'spentpct') { av = a.alloc ? a.spent / a.alloc : 0; bv = b.alloc ? b.spent / b.alloc : 0; }
+      else { av = a[sk]; bv = b[sk]; }
+      if (typeof av === 'string') return av.localeCompare(bv) * dir;
+      return (av - bv) * dir;
+    };
+    const mapRow = (r, i) => ({
+      name: r.name, state: r.state, type: r.type === 'State/DC' ? 'State / DC' : (r.type === 'Territorial Government' ? 'Territorial' : 'Local Gov'),
+      tierLabel: 'T' + r.tier,
+      tierBadge: `display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:${tierColors[r.tier]};color:${r.tier === '5' ? '#1a1814' : '#fff'};`,
+      alloc: this.fmt(r.alloc), spent: this.fmt(r.spent),
+      spentPct: (r.alloc ? (r.spent / r.alloc * 100) : 0).toFixed(0) + '%',
+      spentPctW: Math.min(100, r.alloc ? r.spent / r.alloc * 100 : 0).toFixed(1) + '%',
+      bb: this.fmt(r.bb),
+      rowStyle: `border-bottom:1px solid #efe9dc;background:${i % 2 ? '#faf7f0' : 'transparent'};`
+    });
+    const tierNamesShort = { '1': 'Tier 1 · States & large metros', '2': 'Tier 2 · Mid-size local gov', '5': 'Tier 5 · Small local gov' };
+    const tq = (this.state.tableQ || '').trim().toLowerCase();
+    const tableData = tq ? f.filter(r => r.name.toLowerCase().includes(tq) || r.state.toLowerCase().includes(tq) || r.id.toLowerCase().includes(tq)) : f;
+    const tierSections = ['1', '2', '5'].filter(t => tableData.some(r => r.tier === t)).map(t => {
+      const group = tableData.filter(r => r.tier === t).sort(sortFn);
+      const collapsed = tq ? false : !!this.state.collapsed[t];
+      const totA = group.reduce((s, r) => s + r.alloc, 0);
+      return {
+        tier: t, label: tierNamesShort[t], color: tierColors[t],
+        meta: group.length + ' recipients · ' + this.fmt(totA) + ' allocated',
+        caret: collapsed ? '▸' : '▾',
+        onClick: () => this.toggleTier(t),
+        headerStyle: `cursor:pointer;background:#f3eee3;border-bottom:2px solid ${tierColors[t]};user-select:none;`,
+        rows: collapsed ? [] : group.map(mapRow)
+      };
+    });
+
+    const anyFilter = this.state.tier !== 'all' || this.state.type !== 'all' || this.state.stateSel !== 'all' || this.state.q !== '';
+
+    return {
+      kpis, tierChips, typeChips, metricChips, tiles, tierDonut, typeDonut, bars, columns, tierSections,
+      filteredCount: f.length,
+      total: this.DATA.length,
+      tableCount: tableData.length,
+      tableQuery: this.state.tableQ,
+      onTableSearch: e => this.setState({ tableQ: e.target.value }),
+      query: this.state.q,
+      onSearch: e => this.setState({ q: e.target.value }),
+      anyFilter,
+      resetFilters: () => this.setState({ tier: 'all', type: 'all', stateSel: 'all', q: '' }),
+      allocColor: pal.c1, spentColor: pal.c2, bbColor: pal.c3,
+      tierTotal: this.fmt(tA), typeTotal: this.fmt(tA),
+      stateCountLabel: nStates + ' states active',
+      legendLow: 'Low', legendHigh: 'High', legendGradient,
+      mapMetricLabel: metricLabel
+    };
+  }
+}
+</script>
+</body>
+</html>
